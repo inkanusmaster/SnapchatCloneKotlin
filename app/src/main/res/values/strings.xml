@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Snapchat Clone Kotlin</string>
+    <string name="add_snap">Add snap</string>
+    <string name="logout">Logout</string>
 </resources>
