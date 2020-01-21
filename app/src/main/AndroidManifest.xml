@@ -4,6 +4,7 @@
     package="mfuryw.snapchatclonekotlin">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -13,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".CreateSnapActivity"></activity>
+        <activity android:name=".CreateSnapActivity" />
         <activity android:name=".SnapsActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
