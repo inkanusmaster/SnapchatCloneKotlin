@@ -65,7 +65,7 @@ class CreateSnapActivity : AppCompatActivity() {
         }
     }
 
-    fun next (view: View) {
+    fun next(view: View) {
         createSnapImageView?.isDrawingCacheEnabled = true
         createSnapImageView?.buildDrawingCache()
         val bitmap = (createSnapImageView?.drawable as BitmapDrawable).bitmap
@@ -85,7 +85,6 @@ class CreateSnapActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_snap)
-
         createSnapImageView = findViewById(R.id.createSnapImageView)
         messageEditText = findViewById(R.id.messageEditText)
     }

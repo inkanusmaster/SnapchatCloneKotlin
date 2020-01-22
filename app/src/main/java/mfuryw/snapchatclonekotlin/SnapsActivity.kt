@@ -9,7 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 
 class SnapsActivity : AppCompatActivity() {
 
-    val auth = FirebaseAuth.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean { // tworzymy menu opcje trzy kropki
         val inflater = menuInflater
