@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 //                        Dodajemy users do którego wrzucamy uid usera a dalej email, któremu już ustawiamy value konkretne. Wykrzykniki bo nie może być null.
 //                        UWAGA. Dobrze żeby w bazie coś było już recznie utworzone bo Firebase nie chce mi jakoś pustej bazy zapisać.
 
-                        FirebaseDatabase.getInstance().reference.child("users").child(task.result!!.user!!.uid).child("email").setValue(emailEditText?.text.toString())
+                        FirebaseDatabase.getInstance().reference.child("users").child(task.result!!.user?.uid!!).child("email").setValue(emailEditText?.text.toString())
                         logIn()
                         Toast.makeText(this, "User created.", Toast.LENGTH_SHORT).show() // zakładanie usera
                     } else {

@@ -28,6 +28,7 @@ class CreateSnapActivity : AppCompatActivity() {
     var createSnapImageView: ImageView? = null
     var messageEditText: EditText? = null
     private val imageName = UUID.randomUUID().toString() + ".jpeg" // losowa nazwa pliku
+    private var bitmap: Bitmap? = null
 
     private fun getPhoto() { // robimy intent do pobierania foteczek i startujemy startactivityforresult (to służy do przekazania danych z powrotem z intentu drugiego do pierwszego)
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
@@ -68,7 +69,12 @@ class CreateSnapActivity : AppCompatActivity() {
     fun next(view: View) {
         createSnapImageView?.isDrawingCacheEnabled = true
         createSnapImageView?.buildDrawingCache()
-        val bitmap = (createSnapImageView?.drawable as BitmapDrawable).bitmap
+        try{
+            bitmap = (createSnapImageView?.drawable as BitmapDrawable).bitmap /////////////////////////// POPRAW!!! JAK NIE WCZYTASZ OBRAZKA I DASZ NEXT TO WYWALA!!!!!!!!!!!!
+            //////////////////////// OGARNIJ ŻEBY NIE DALO SIĘ NA PUSTYM DAC NEXT!!!!
+        } catch (e: Exception){
+            e.printStackTrace()
+        }
         val baos = ByteArrayOutputStream()
         bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
         val data = baos.toByteArray()
@@ -78,7 +84,8 @@ class CreateSnapActivity : AppCompatActivity() {
             Toast.makeText(this, "Failed to upload image!", Toast.LENGTH_LONG).show()
 
         }.addOnSuccessListener {
-            Toast.makeText(this, "Image uploaded with success!", Toast.LENGTH_LONG).show()
+            val intent = Intent(this, ChooseUserActivity::class.java)
+            startActivity(intent)
         }
     }
 
