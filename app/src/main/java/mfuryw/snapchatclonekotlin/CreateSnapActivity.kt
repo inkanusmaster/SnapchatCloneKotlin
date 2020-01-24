@@ -69,10 +69,10 @@ class CreateSnapActivity : AppCompatActivity() {
     fun next(view: View) {
         createSnapImageView?.isDrawingCacheEnabled = true
         createSnapImageView?.buildDrawingCache()
-        try{
+        try {
             bitmap = (createSnapImageView?.drawable as BitmapDrawable).bitmap /////////////////////////// POPRAW!!! JAK NIE WCZYTASZ OBRAZKA I DASZ NEXT TO WYWALA!!!!!!!!!!!!
             //////////////////////// OGARNIJ ŻEBY NIE DALO SIĘ NA PUSTYM DAC NEXT!!!!
-        } catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
         val baos = ByteArrayOutputStream()
@@ -85,6 +85,12 @@ class CreateSnapActivity : AppCompatActivity() {
 
         }.addOnSuccessListener {
             val intent = Intent(this, ChooseUserActivity::class.java)
+            val imageURL = uploadTask.snapshot.uploadSessionUri
+            // przesyłamy do intenta imageurl imagename i message do chooseuseractivity aby uzupełnić nimi bazę po kliknięciu w użytkownika
+            intent.putExtra("imageURL", imageURL.toString())
+            intent.putExtra("imageName", imageName)
+            intent.putExtra("message", messageEditText?.text.toString())
+
             startActivity(intent)
         }
     }

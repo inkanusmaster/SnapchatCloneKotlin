@@ -1,10 +1,12 @@
 package mfuryw.snapchatclonekotlin
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -43,8 +45,11 @@ class ChooseUserActivity : AppCompatActivity() {
         // wysyłając komuś coś, robimy mu w bazie dodatkowe childy np snaps, który zawiera from z value od kogo
         // każdy snap powinien zawierać unikatową nazwę uuid. Snap poza polem from  i nazwą snapa powinien mieć pole url z urlem snapa i pole message z wiadomością
         // do tego robimy mapę String key i String value
+        // wartości które wpisujemy zostały przesłane z intenta createsnapactivity, dlatego pobieramy je przez intent.getStringExtra
         chooseUserListView?.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, i, l ->
-            val snapMap: Map<String, String> = mapOf("from" to "", "imageName" to "", "imageURL" to "", "message" to "") // deklarujemy mapkę
+            val snapMap: Map<String, String> = mapOf(
+                "from" to FirebaseAuth.getInstance().currentUser!!.email!!.toString(), "imageName" to intent.getStringExtra("imageName"), "imageURL" to intent.getStringExtra("imageURL"), "message" to intent.getStringExtra("message")
+            ) // deklarujemy mapkę
 
             // dodajemy do bazy do kogo wysyłamy snapa przy pomocy uuid. keys[i] wskaze nam usera na którego klikniemy.
             // dodatkowo do grupy snaps dodajemy snap o losowym uuid (ten snam będzie zawierał ww. 4 pola)
@@ -52,7 +57,11 @@ class ChooseUserActivity : AppCompatActivity() {
             FirebaseDatabase.getInstance().reference.child("users").child(keys[i]).child("snaps").push().setValue(snapMap)
 
             // po wysłaniu wracamy do SnapsActivity
+            val intent = Intent(this, SnapsActivity::class.java)
 
+            // zamiast uruchamiać od nowa ten intent, zamyka inne aktywności, które są nad nią i ten intent teraz będzie na topie
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            startActivity(intent)
         }
     }
 }
