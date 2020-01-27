@@ -11,6 +11,7 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import kotlinx.android.synthetic.main.activity_snaps.*
 
 class ChooseUserActivity : AppCompatActivity() {
 
@@ -31,16 +32,18 @@ class ChooseUserActivity : AppCompatActivity() {
         FirebaseDatabase.getInstance().reference.child("users").addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(p0: DataSnapshot, p1: String?) { // będziemy dodawać emaile do array listy
                 val email = p0.child("email").value as String // p0 typu datasnapshot używamy to wyciągnięcia value z emaila. jakoś tak
-                emails.add(email) // dodajemy email
-                keys.add(p0.key!!) // dodajemy uuid
-                adapter.notifyDataSetChanged() // update adapter
+                if (email != FirebaseAuth.getInstance().currentUser?.email.toString()) { // nie chcemy na listę dodawać obecnie zalogowanego usera bo wysyłanie snapów do siebie ssie.
+                    emails.add(email) // dodajemy email
+                    keys.add(p0.key!!) // dodajemy uuid
+                    adapter.notifyDataSetChanged() // update adapter
+                }
             }
-
             override fun onCancelled(p0: DatabaseError) {}
             override fun onChildMoved(p0: DataSnapshot, p1: String?) {}
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {}
             override fun onChildRemoved(p0: DataSnapshot) {}
         })
+
         // robimy listener dla listview coby ogarnąć co się dzieje jak się kogoś zaznaczy
         // wysyłając komuś coś, robimy mu w bazie dodatkowe childy np snaps, który zawiera from z value od kogo
         // każdy snap powinien zawierać unikatową nazwę uuid. Snap poza polem from  i nazwą snapa powinien mieć pole url z urlem snapa i pole message z wiadomością

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import com.google.firebase.auth.FirebaseAuth
@@ -12,12 +13,15 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import kotlinx.android.synthetic.main.activity_snaps.*
 
 class SnapsActivity : AppCompatActivity() {
 
     private val auth = FirebaseAuth.getInstance()
     private var snapsListView: ListView? = null // lista ze snapami
     var emails: ArrayList<String> = ArrayList() // to są osoby które wysłały nam snapa
+    var snaps: ArrayList<DataSnapshot> = ArrayList() // lista typu DataSnapshot zawiera info o message, o image name o image url... Potrzebne dane do odebrania snapa
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean { // tworzymy menu opcje trzy kropki
         val inflater = menuInflater
@@ -51,9 +55,10 @@ class SnapsActivity : AppCompatActivity() {
         snapsListView?.adapter = adapter
 
         // wyciągamy info z users -> JA -> snaps. Czyli snapy, które my otrzymaliśmy. Zaimplementowane różne metody
-        FirebaseDatabase.getInstance().reference.child("users").child(auth.currentUser!!.uid).child("snaps").addChildEventListener(object: ChildEventListener {
+        FirebaseDatabase.getInstance().reference.child("users").child(auth.currentUser!!.uid).child("snaps").addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(p0: DataSnapshot, p1: String?) { // wyciągamy info i wrzucamy do arraylist ze snapami
                 emails.add(p0.child("from").value as String)
+                snaps.add(p0) // dodajemy do listy snaps wszystko co w snaps! (bo to nasza ścieżka)
                 adapter.notifyDataSetChanged()
             }
 
@@ -62,5 +67,16 @@ class SnapsActivity : AppCompatActivity() {
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {}
             override fun onChildRemoved(p0: DataSnapshot) {}
         })
+
+        // pobieranie snapa. Pamiętamy że w liście snaps mamy wszystko odnośnie snapa.
+        snapsListView?.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, i, l ->
+            val snapshot = snaps[i] // zmienna snapshot posiada całe info o snapie (bo całe p0 dodaliśmy) w którego kliknęliśmy (indeks i)
+            val intent = Intent(this, ViewSnapsActivity::class.java) // otwieramy aktywność ze snapem, tj. ta co zawiera wiadomość i obraz
+            intent.putExtra("imageName", snapshot.child("imageName").value as String) // wysyłamy obraz, który będzie wyświetlany w snapie
+            intent.putExtra("imageURL", snapshot.child("imageURL").value as String) // jw. url.
+            intent.putExtra("message", snapshot.child("message").value as String) // jw. wiadomość
+            intent.putExtra("snapKey", snapshot.key) // odpowiedni klucz do snapshota (ten losowy ciąg znaków snapa) dzięki któremu będziemy mogli go usunąć po obejrzeniu
+            startActivity(intent)
+        }
     }
 }

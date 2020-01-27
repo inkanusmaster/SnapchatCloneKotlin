@@ -14,7 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
-        <activity android:name=".ChooseUserActivity"></activity>
+        <activity android:name=".ViewSnapsActivity"></activity>
+        <activity android:name=".ChooseUserActivity" />
         <activity android:name=".CreateSnapActivity" />
         <activity android:name=".SnapsActivity" />
         <activity android:name=".MainActivity">
