@@ -26,6 +26,16 @@ class ViewSnapsActivity : AppCompatActivity() {
         snapImageView = findViewById(R.id.snapImageView)
 
         messageTextView?.text = intent.getStringExtra("message") // odbieramy wiadomość
+
+        val task = ImageDownloader()
+        val myImage: Bitmap
+        try {
+            myImage = task.execute(intent.getStringExtra("imageURL")).get()!!
+            snapImageView?.setImageBitmap(myImage)
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+
     }
 
     // Pobieranie obrazów jest nieco bardziej skomplikowane. Wykorzystamy tutaj imagedownloader z innego projektu. Przerobiony automatycznie na kotlin

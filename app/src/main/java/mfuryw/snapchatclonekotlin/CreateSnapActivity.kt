@@ -82,7 +82,6 @@ class CreateSnapActivity : AppCompatActivity() {
         val uploadTask = FirebaseStorage.getInstance().reference.child("images").child(imageName).putBytes(data)
         uploadTask.addOnFailureListener {
             Toast.makeText(this, "Failed to upload image!", Toast.LENGTH_LONG).show()
-
         }.addOnSuccessListener {
             val intent = Intent(this, ChooseUserActivity::class.java)
             val imageURL = uploadTask.snapshot.uploadSessionUri
