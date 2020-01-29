@@ -30,10 +30,12 @@ class ViewSnapsActivity : AppCompatActivity() {
         val task = ImageDownloader()
         val myImage: Bitmap
         try {
+            println("PO KLIKNIECIU W USERA: "+intent.getStringExtra("imageURL"))
             myImage = task.execute(intent.getStringExtra("imageURL")).get()!!
             snapImageView?.setImageBitmap(myImage)
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
+            println("WYWALILO BLAD PO KLIKNIECIU W USERA!!!")
         }
 
     }

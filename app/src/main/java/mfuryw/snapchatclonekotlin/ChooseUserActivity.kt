@@ -59,9 +59,10 @@ class ChooseUserActivity : AppCompatActivity() {
             // pod snaps wrzuamy cała nasza mapę przy pomocy .push().setValue(snapMap). push zrobi to nam też losowy uuid dla snapaa setvalue(snapMap) uzupełni polami
             FirebaseDatabase.getInstance().reference.child("users").child(keys[i]).child("snaps").push().setValue(snapMap)
 
-            // po wysłaniu wracamy do SnapsActivity
+            // będziemy wysyłać do SnapsActivity aby po kliknięciu w usera na liście zobaczyć obrazek i message
             val intent = Intent(this, SnapsActivity::class.java)
 
+            // po wysłaniu wracamy do SnapsActivity
             // zamiast uruchamiać od nowa ten intent, zamyka inne aktywności, które są nad nią i ten intent teraz będzie na topie
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             startActivity(intent)

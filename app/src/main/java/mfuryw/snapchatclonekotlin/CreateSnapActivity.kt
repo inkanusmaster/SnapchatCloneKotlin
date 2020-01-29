@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -15,7 +16,9 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.tasks.Continuation
 import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import java.io.ByteArrayOutputStream
@@ -79,19 +82,42 @@ class CreateSnapActivity : AppCompatActivity() {
         bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, baos)
         val data = baos.toByteArray()
 
-        val uploadTask = FirebaseStorage.getInstance().reference.child("images").child(imageName).putBytes(data)
-        uploadTask.addOnFailureListener {
-            Toast.makeText(this, "Failed to upload image!", Toast.LENGTH_LONG).show()
-        }.addOnSuccessListener {
-            val intent = Intent(this, ChooseUserActivity::class.java)
-            val imageURL = uploadTask.snapshot.uploadSessionUri
-            // przesyłamy do intenta imageurl imagename i message do chooseuseractivity aby uzupełnić nimi bazę po kliknięciu w użytkownika
-            intent.putExtra("imageURL", imageURL.toString())
-            intent.putExtra("imageName", imageName)
-            intent.putExtra("message", messageEditText?.text.toString())
+        val ref = FirebaseStorage.getInstance().reference.child("images").child(imageName)
+        val uploadTask = ref.putBytes(data)
 
-            startActivity(intent)
+        uploadTask.continueWithTask(Continuation<UploadTask.TaskSnapshot, Task<Uri>> { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
+                    Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show()
+                    throw it
+                }
+            }
+            return@Continuation ref.downloadUrl
+        }).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                println("TAKI URL:" + task.result.toString())
+                val intent = Intent(this, ChooseUserActivity::class.java)
+                intent.putExtra("imageURL", task.result.toString())
+                intent.putExtra("imageName", imageName)
+                intent.putExtra("message", messageEditText?.text.toString())
+                startActivity(intent)
+            }
         }
+
+
+//        val uploadTask = FirebaseStorage.getInstance().reference.child("images").child(imageName).putBytes(data)
+//        uploadTask.addOnFailureListener {
+//            Toast.makeText(this, "Failed to upload image!", Toast.LENGTH_LONG).show()
+//        }.addOnSuccessListener {
+//            val intent = Intent(this, ChooseUserActivity::class.java)
+//            val imageURL = uploadTask.snapshot.uploadSessionUri
+//            // przesyłamy do intenta imageurl imagename i message do chooseuseractivity aby uzupełnić nimi bazę po kliknięciu w użytkownika
+//            intent.putExtra("imageURL", imageURL.toString())
+//            intent.putExtra("imageName", imageName)
+//            intent.putExtra("message", messageEditText?.text.toString())
+//
+//            startActivity(intent)
+//        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
