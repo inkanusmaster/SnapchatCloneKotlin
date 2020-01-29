@@ -62,10 +62,23 @@ class SnapsActivity : AppCompatActivity() {
                 adapter.notifyDataSetChanged()
             }
 
+            // jeśli usunięto cokolwiek, child (czyli po wciśnięciu back, jak z bazy zostanie usunięty snap)? Trzeba usunąć z listy usera od którego go dostaliśmy
+            // czyli usuwamy z arraylisty email, która zawierała usera który wysłał oraz z arraylisty snaps, któa zawierała wszystkie dane o snapie (typ DataSnapshot)
+            override fun onChildRemoved(p0: DataSnapshot) {
+                // przyda nam się indeks usuwanego snapa
+                // kotlin sam zrobił withIndex! Widocznie zaczyna pętlę for od 0 i inkrementuja przy każdej pętli
+                for ((index, snap: DataSnapshot) in snaps.withIndex()) { // loopujemy po wszystkich snapach w snaps (DataSnapshot - pełne info o snapie)
+                    if (snap.key == p0?.key) { // loopujemy. Jeśli trafimy na dany key snapshota, który jest równy keyowi p0 (czyli usuniętego bo w metodzie onChildRemoved)...
+                        snaps.removeAt(index) // usuwamy z arraylist - emails i snaps
+                        emails.removeAt(index)
+                    }
+                }
+                adapter.notifyDataSetChanged()
+            }
+
             override fun onCancelled(p0: DatabaseError) {}
             override fun onChildMoved(p0: DataSnapshot, p1: String?) {}
             override fun onChildChanged(p0: DataSnapshot, p1: String?) {}
-            override fun onChildRemoved(p0: DataSnapshot) {}
         })
 
         // pobieranie snapa. Pamiętamy że w liście snaps mamy wszystko odnośnie snapa.

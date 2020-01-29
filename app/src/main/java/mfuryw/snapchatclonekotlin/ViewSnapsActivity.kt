@@ -7,15 +7,20 @@ import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
 
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class ViewSnapsActivity : AppCompatActivity() {
 
     var messageTextView: TextView? = null
     var snapImageView: ImageView? = null
+    private val auth = FirebaseAuth.getInstance() //potrzebujemy aby usunąć snapa po wciśnięciu back temu konkretnemu użytkownikowi (zalogowanemu)
 
     // ta aktywność otwiera się po odebraniu snapa
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,12 +35,10 @@ class ViewSnapsActivity : AppCompatActivity() {
         val task = ImageDownloader()
         val myImage: Bitmap
         try {
-            println("PO KLIKNIECIU W USERA: "+intent.getStringExtra("imageURL"))
             myImage = task.execute(intent.getStringExtra("imageURL")).get()!!
             snapImageView?.setImageBitmap(myImage)
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
-            println("WYWALILO BLAD PO KLIKNIECIU W USERA!!!")
         }
 
     }
@@ -54,5 +57,18 @@ class ViewSnapsActivity : AppCompatActivity() {
                 null
             }
         }
+    }
+
+    // usuwamy snapa po kliknięciu back. Całkowicie. I z listy, i z bazy, i ze storagu
+    override fun onBackPressed() {
+        super.onBackPressed()
+
+        // usuwamy z bazy. Idziemy po drzewku do snapa. czyli users -> uid zalogowanego usera -> snaps -> klucz konkretnego snapa przesłany z intenta SnapsActivity. Na koniec removeValue.
+        FirebaseDatabase.getInstance().reference.child("users").child(auth.currentUser!!.uid).child("snaps").child(intent.getStringExtra("snapKey")).removeValue()
+
+        // usuwamy ze storagu. Folder images. DLATEGO PRZESYLAMY TEŻ IMAGE NAME Z INTENTU SNAPSACTIVITY!!!
+        FirebaseStorage.getInstance().reference.child("images").child(intent.getStringExtra("imageName")).delete()
+
+        // Z LISTY BĘDZIEMY USUWAC W SNAPSACTIVITY W METODZIE ONCHILDREMOVED!
     }
 }

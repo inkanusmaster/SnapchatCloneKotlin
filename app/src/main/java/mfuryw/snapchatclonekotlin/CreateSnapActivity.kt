@@ -95,7 +95,6 @@ class CreateSnapActivity : AppCompatActivity() {
             return@Continuation ref.downloadUrl
         }).addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                println("TAKI URL:" + task.result.toString())
                 val intent = Intent(this, ChooseUserActivity::class.java)
                 intent.putExtra("imageURL", task.result.toString())
                 intent.putExtra("imageName", imageName)
@@ -103,21 +102,6 @@ class CreateSnapActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
-
-
-//        val uploadTask = FirebaseStorage.getInstance().reference.child("images").child(imageName).putBytes(data)
-//        uploadTask.addOnFailureListener {
-//            Toast.makeText(this, "Failed to upload image!", Toast.LENGTH_LONG).show()
-//        }.addOnSuccessListener {
-//            val intent = Intent(this, ChooseUserActivity::class.java)
-//            val imageURL = uploadTask.snapshot.uploadSessionUri
-//            // przesyłamy do intenta imageurl imagename i message do chooseuseractivity aby uzupełnić nimi bazę po kliknięciu w użytkownika
-//            intent.putExtra("imageURL", imageURL.toString())
-//            intent.putExtra("imageName", imageName)
-//            intent.putExtra("message", messageEditText?.text.toString())
-//
-//            startActivity(intent)
-//        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
